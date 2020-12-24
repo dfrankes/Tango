@@ -1,4 +1,6 @@
 ﻿using CSM.Commands.Data.Internal;
+using CSM.Networking;
+using CSM.Networking.Status;
 using CSM.Panels;
 using UnityEngine;
 
@@ -13,6 +15,14 @@ namespace CSM.Commands.Handler.Internal
 
         protected override void Handle(PlayerLocationCommand command)
         {
+            if (MultiplayerManager.Instance.CurrentRole == MultiplayerRole.None ||
+                (MultiplayerManager.Instance.CurrentRole == MultiplayerRole.Client &&
+                MultiplayerManager.Instance.CurrentClient.Status != ClientStatus.Connected))
+            {
+                // Ignore packets while not connected
+                return;
+            }
+
             GameObject _playerLocation = GameObject.Find("/PlayerLocation_" + command.PlayerName);
             LineRenderer lineRenderer;
             if (_playerLocation == null)
@@ -43,12 +53,12 @@ namespace CSM.Commands.Handler.Internal
                 lineRenderer.startWidth = 1;
                 lineRenderer.endWidth = 1;
             }
-            
+
             // Set cube rotation to match the camera
             Transform playerLocation = _playerLocation.transform;
             playerLocation.position = command.PlayerCameraPosition;
             playerLocation.rotation = command.PlayerCameraRotation;
-            
+
             // Make the LineRendered shoot forward (in the direction of the cube)
             Vector3 position = playerLocation.position;
             lineRenderer.SetPosition(0, position);

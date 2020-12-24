@@ -1,15 +1,14 @@
-﻿using System;
-using ColossalFramework.UI;
+﻿using ColossalFramework.UI;
 using CSM.Commands;
+using CSM.Commands.Data.Internal;
+using CSM.Container;
 using CSM.Helpers;
 using CSM.Networking;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using ColossalFramework.Threading;
-using CSM.Commands.Data.Internal;
-using CSM.Container;
 using UnityEngine;
 
 namespace CSM.Panels
@@ -58,8 +57,9 @@ namespace CSM.Panels
                 }),
                 new ChatCommand("support", "Display support links for the mod.", (command) =>
                 {
-                    PrintGameMessage("GitHub : https://github.com/DominicMaas/Tango");
-                    PrintGameMessage("Discord : https://www.patreon.com/CSM_MultiplayerMod");
+                    PrintGameMessage("Website : https://citiesskylinesmultiplayer.com");
+                    PrintGameMessage("GitHub : https://github.com/CitiesSkylinesMultiplayer/CSM");
+                    PrintGameMessage("Discord : https://discord.gg/RjACPhd");
                     PrintGameMessage("Steam Workshop : https://steamcommunity.com/sharedfiles/filedetails/?id=1558438291");
                 }),
                 new ChatCommand("players", "Displays a list of players connected to the server", (command) =>
@@ -82,7 +82,7 @@ namespace CSM.Panels
                 new ChatCommand("donate", "Find out how to support the mod developers", (command) =>
                 {
                     PrintGameMessage("Want to help support the mod?");
-                    PrintGameMessage("Help develop the mod here: https://github.com/DominicMaas/Tango");
+                    PrintGameMessage("Help develop the mod here: https://github.com/CitiesSkylinesMultiplayer/CSM");
                     PrintGameMessage("Donate to the developers here: https://www.patreon.com/CSM_MultiplayerMod");
                 }),
                 new ChatCommand("clear", "Clear everything from the chat log.", (command) =>
@@ -99,24 +99,9 @@ namespace CSM.Panels
                     {
                         PrintGameMessage("Requesting the save game from the server");
 
-                        // Show overlay panel
-                        ClientJoinPanel clientJoinPanel = UIView.GetAView().FindUIComponent<ClientJoinPanel>("MPClientJoinPanel");
-                        if (clientJoinPanel != null)
-                        {
-                            clientJoinPanel.isVisible = true;
-                        }
-                        else 
-                        {
-                            clientJoinPanel = (ClientJoinPanel)UIView.GetAView().AddUIComponent(typeof(ClientJoinPanel));
-                        }
-
-                        clientJoinPanel.IsSelf = true;
-                        clientJoinPanel.UpdateText();
-                        clientJoinPanel.Focus();
-
                         MultiplayerManager.Instance.CurrentClient.Status = Networking.Status.ClientStatus.Downloading;
                         SimulationManager.instance.SimulationPaused = true;
-                        MultiplayerManager.Instance.GameBlocked = true;
+                        MultiplayerManager.Instance.BlockGameReSync();
 
                         Command.SendToServer(new RequestWorldTransferCommand());
                     }
